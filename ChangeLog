@@ -1,3 +1,5 @@
 2014-09-10 Matt:
-	* RayTracer created. The other programs found were more complicated than needed. 
-	* Adding basic structure I have thought of so far
+	* RayTracer created. The other programs found were more complicated than needed.
+	* Adding basic structure I have thought of so far.
+	* Adding skeleton of main to create a window and the ice block.
+	* Adding code for the ice block
