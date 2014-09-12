@@ -1,3 +1,13 @@
+2014-09-12 Matt:
+	* Committing fix for the 55 angle
+	* Still bugs when rotate iceblock. Main issue is refracted angle not in same coord system.
+
+2014-09-11 Matt:
+	* Committing working version with a few bugs
+	* There is one error that has to do with how you cycle between the sides of the cube.
+	  The issue happens at 55 degrees right now, where you get many TIR at the same angle.
+	  Fix tomorrow/later
+
 2014-09-10 Matt:
 	* RayTracer created. The other programs found were more complicated than needed.
 	* Adding basic structure I have thought of so far.

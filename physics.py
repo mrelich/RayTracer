@@ -30,16 +30,16 @@ def interactionPoint(rayAngle, rayY0, rayX0,
         return (-9999,-9999)
     
     # Handle the case of x=constant
-    if boundaryX0 != sys.float_info.max:
+    if boundarySlope == sys.float_info.max:
         x = boundaryX0
         y = tan(rayAngle)*(x-rayX0) + rayY0
-        print "Fixed x: ", x, y
+        #print "\tFixed x: ", x, y
         return (x,y)
     
     # All other cases can follow this:
-    x = (boundaryY0 - rayY0) / (tan(rayAngle) - boundarySlope) - rayX0
+    x = (boundaryY0 - rayY0) / (tan(rayAngle) - boundarySlope) + rayX0
     y = boundarySlope * (x) + boundaryY0
-    print "Not Fixed x: ", x, y
+    #print "\tNot Fixed x: ", x, y
     return (x,y)
 
 #---------------------------------------------#
@@ -70,14 +70,14 @@ def incidentAngle(v_ray, v_boundary,activeSide):
 #---------------------------------------------#
 # Check for refraction
 #---------------------------------------------#
-def refractedAngle(incidentAngle):
+def refractedAngle(incidentAngle, slope):
     
     # Check for TIR case first
     arg = nIce/nAir * sin(fabs(incidentAngle))
     
     # If arg > 1, we have TIR
     if arg > 1: return -1
-    
+
     # Otherwise, the ray leaves
     #print asin(arg)
     return asin(arg)

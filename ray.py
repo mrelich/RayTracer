@@ -50,7 +50,6 @@ class ray:
         newX = p1[0] - p0[0]
         newY = p1[1] - p0[1]
         vect = (newX, newY)
-        print "Making vector", p0, p1, vect
         return vect
 
     #----------------------------------#
@@ -60,6 +59,7 @@ class ray:
         print "Drawing Ray"
         print self.points
         self.ray = curve(pos=self.points,
-                         color=(0,0,0)
+                         color=(0,0,0),
+                         radius=0.005
                          )
         

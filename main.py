@@ -40,7 +40,8 @@ icey = 0
 icez = 0
 
 # Angle to rotate
-rotAng = 0. # [rad]
+rotAng = -30*pi/180. # [rad]
+#rotAng = 0. # [rad]
 
 # make the cube
 iceblock = cube(icex,icey,icez,length,height,rotAng)
@@ -54,18 +55,19 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 
 angles = []
 conv = pi/180.
-if True: #False:
+if True: #True:
     #angles.append(90*conv)
     #angles.append(30*conv)
     #angles.append(40*conv)
     angles.append(90*conv)
     angles.append(55*conv)
+    #angles.append(50*conv)
     #angles.append(10*conv)
     #angles.append(60*conv)
 if False: #True: 
-    nStep =8 # 18
+    nStep =9 # 18
     step = 10 # [deg]
-    start = 5
+    start = 0
     for i in range(nStep+1):
         angles.append(conv*(start +i*step))
 
@@ -96,13 +98,14 @@ for ang in angles:
     angRef   = -1
     nSides   = 0
     activeSide = -1
-    while angRef < 0 and nSides <= 4:
-        print "-=-=-=-=-=-=-=-=-=- ", activeSide, " -=-=-=-=-=-=-=-=-=-=-"
+    while angRef < 0 and nSides <= 6:
+
         # Get interaction point
         intPoint = (0,0)
         v_normal   = (0,0)
         insideIce = False
-        print "Looping over equations: "
+        print "Looping over equations: ", nSides
+        print "with coords: ", newray.angle*180/pi, newray.x, newray.y
         for i in range(len(iceEq)):
             #if i == activeSide: continue
             eq = iceEq[i]
@@ -113,8 +116,6 @@ for ang in angles:
                                         eq[1],
                                         eq[2])
 
-            print "\tRay info: ", newray.angle, newray.y, newray.x
-            print "\tEq info: ", eq
             if iceblock.inCube(intPoint): 
                 insideIce = True
                 activeSide = i
@@ -131,27 +132,24 @@ for ang in angles:
         # Protect against exhausting all options
         if not insideIce: break
         newray.addPoint(intPoint[0],intPoint[1])
-        print "Inter Point: ", intPoint
 
         # Get Incident angle
         #print "Prior to Incident; ", newray.getVector(), v_normal
         incAngle = incidentAngle(newray.getVector(),v_normal,activeSide)
-        print "Incident: ", incAngle, incAngle*180/pi
 
         # Check if there is refraction
-        angRef = refractedAngle(incAngle)
+        angRef = refractedAngle(incAngle, newray.angle)
+        print "\t\tRefracted angle", angRef * 180/pi
 
-        print "Refracted angle: ", angRef, angRef*180/pi
         if angRef < 0: 
             print "TIR!"
             sign = -1
-            #if newray.angle < 0: sign = 1
+            if newray.angle < 0: sign = 1
             newAngle = sign*(pi/2 - incAngle)
             newray.update(sign*(pi/2 - incAngle),intPoint[1],intPoint[0])
             #newray.addPoint(intPoint[0], intPoint[1])
-            print "\t New Angle: ", newray.angle, newray.angle*180/pi, " new y0: ", newray.y
         else:
-            print "Adding new point"
+            angRef -= iceblock.rotation
             x = 0
             y = 0
             sign = 1
