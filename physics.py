@@ -33,13 +33,13 @@ def interactionPoint(rayAngle, rayY0, rayX0,
     if boundarySlope == sys.float_info.max:
         x = boundaryX0
         y = tan(rayAngle)*(x-rayX0) + rayY0
-        #print "\tFixed x: ", x, y
+        print "\t\tFixed x: ", x, y
         return (x,y)
     
     # All other cases can follow this:
     x = (boundaryY0 - rayY0) / (tan(rayAngle) - boundarySlope) + rayX0
     y = boundarySlope * (x) + boundaryY0
-    #print "\tNot Fixed x: ", x, y
+    print "\t\tNot Fixed x: ", x, y
     return (x,y)
 
 #---------------------------------------------#
@@ -51,13 +51,12 @@ def incidentAngle(v_ray, v_boundary,activeSide):
     # of the ray on the boundary so we can
     # later check snell's law. 
     # Incident Angle = 90 - angle between vectors
-    print "\tVectors: ", v_ray, v_boundary
     mag = v_ray[0]*v_boundary[0] + v_ray[1]*v_boundary[1]
     magRay = sqrt(v_ray[0]*v_ray[0]+v_ray[1]*v_ray[1])
     magB   = sqrt(v_boundary[0]*v_boundary[0]+v_boundary[1]*v_boundary[1])
     angle = acos( mag/(magRay*magB) )
 
-    print "\tAngle between vectors: ", angle, angle*180/pi
+    #print "\tAngle between vectors: ", angle, angle*180/pi
     #print "\tIncident angle: ",  angle, (pi/2.-angle)*180/pi
     
     # Subtract pi/2
@@ -70,7 +69,7 @@ def incidentAngle(v_ray, v_boundary,activeSide):
 #---------------------------------------------#
 # Check for refraction
 #---------------------------------------------#
-def refractedAngle(incidentAngle, slope):
+def refractedAngle(incidentAngle, slope, activeSide, iceTilt):
     
     # Check for TIR case first
     arg = nIce/nAir * sin(fabs(incidentAngle))
@@ -79,10 +78,55 @@ def refractedAngle(incidentAngle, slope):
     if arg > 1: return -1
 
     # Otherwise, the ray leaves
-    #print asin(arg)
-    return asin(arg)
+    angle = asin(arg) 
+    print "In refracted: ", arg, angle, angle*180/pi
+    return angle
 
+
+#---------------------------------------------#
+# Translate angle to det coords
+#---------------------------------------------#
+def translateAngle(x0, y0, intX0, intY0, 
+                   rotAng, refAng, activeSide):
+    # x0,y0 = original position
+    # rayX0,rayY0 = incident point on wall
+    # refAngle = refracted angle
+    # activeSide = side of the cube (0=top, 1=right, etc)
     
+    # The rotation angle is actually for the cube
+    # in the frames orientation.  We want to rotate
+    # our coordinate system such that it is normal to the cube
+    rotAng = -rotAng
+
+    # The idea is to put the coordinate system at
+    # the interaction point with normal to the side
+    # in the positive y direction and then check where
+    # our initial ray point lies to determine the angle
+    # in the coordinate system of the block
+    xt = x0 - intX0  # translate x
+    yt = y0 - intY0  # translate y
+    xr = xt*cos(rotAng) - yt*sin(rotAng)
+    yr = xt*sin(rotAng) + yt*cos(rotAng)
+
+    # Top of cube
+    if activeSide == 0: 
+        if xr > 0: return -refAng
+        return refAng
+    # Right
+    elif activeSide == 1:
+        if yr < 0: return -refAng
+        return refAng
+    # Bottom
+    elif activeSide == 2:
+        if xr < 0: return -refAng
+    # Left
+    elif activeSide == 3:
+        if yr > 0: return -refAng 
+        return refAng
+
+    # Do nothing
+    return refAng
+
 #---------------------------------------------#
 # Get perpendicular vector
 #---------------------------------------------#

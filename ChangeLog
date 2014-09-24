@@ -1,3 +1,8 @@
+2014-09-24 Matt:
+	* Fixed one bug dealing with exiting angle when rotating.
+	* Found another issue due with activeSide and the equations list.
+	* Consider re-writing now that have better idea of how to handle each case.
+
 2014-09-12 Matt:
 	* Committing fix for the 55 angle
 	* Still bugs when rotate iceblock. Main issue is refracted angle not in same coord system.

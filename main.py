@@ -46,6 +46,10 @@ rotAng = -30*pi/180. # [rad]
 # make the cube
 iceblock = cube(icex,icey,icez,length,height,rotAng)
 
+# Draw axis
+#yaxis = curve(pos=[(0,m_world),(0,-m_world)],color=(0,0,0),radius = -0.003)
+#xaxis = curve(pos=[(m_world,0),(-m_world,0)],color = (0,0,0),radius = -0.003)
+
 #-------------------------------------#
 # Determine which angles to draw
 #-------------------------------------#
@@ -55,15 +59,20 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 
 angles = []
 conv = pi/180.
-if True: #True:
+if True:
     #angles.append(90*conv)
     #angles.append(30*conv)
     #angles.append(40*conv)
-    angles.append(90*conv)
-    angles.append(55*conv)
+    #angles.append(90*conv)
     #angles.append(50*conv)
-    #angles.append(10*conv)
     #angles.append(60*conv)
+    #angles.append(50*conv)
+    #angles.append(40*conv)
+    #angles.append(30*conv)
+    angles.append(20*conv)
+    #angles.append(10*conv)
+    #angles.append(0*conv)
+
 if False: #True: 
     nStep =9 # 18
     step = 10 # [deg]
@@ -107,7 +116,6 @@ for ang in angles:
         print "Looping over equations: ", nSides
         print "with coords: ", newray.angle*180/pi, newray.x, newray.y
         for i in range(len(iceEq)):
-            #if i == activeSide: continue
             eq = iceEq[i]
             intPoint = interactionPoint(newray.angle,
                                         newray.y,
@@ -119,6 +127,7 @@ for ang in angles:
             if iceblock.inCube(intPoint): 
                 insideIce = True
                 activeSide = i
+                print "\tActive side: ", activeSide
                 break
 
         # Change order of iceEq
@@ -131,6 +140,7 @@ for ang in angles:
 
         # Protect against exhausting all options
         if not insideIce: break
+        print "\t\tIncident Point: ",intPoint
         newray.addPoint(intPoint[0],intPoint[1])
 
         # Get Incident angle
@@ -138,34 +148,38 @@ for ang in angles:
         incAngle = incidentAngle(newray.getVector(),v_normal,activeSide)
 
         # Check if there is refraction
-        angRef = refractedAngle(incAngle, newray.angle)
-        print "\t\tRefracted angle", angRef * 180/pi
+        angRef = refractedAngle(incAngle, newray.angle, activeSide, rotAng)
+        print "\t\tRefracted angle", angRef, angRef * 180/pi
 
         if angRef < 0: 
             print "TIR!"
             sign = -1
             if newray.angle < 0: sign = 1
             newAngle = sign*(pi/2 - incAngle)
-            newray.update(sign*(pi/2 - incAngle),intPoint[1],intPoint[0])
+            print "Reflected Angle", newAngle*180/pi
+            newray.update(newAngle,intPoint[1],intPoint[0])
             #newray.addPoint(intPoint[0], intPoint[1])
         else:
-            angRef -= iceblock.rotation
+            fixedAngle = translateAngle(newray.x,newray.y,
+                                        intPoint[0],intPoint[1],
+                                        rotAng,angRef,activeSide)
+            fixedAngle -= iceblock.rotation
             x = 0
             y = 0
             sign = 1
             if newray.angle < 0: sign = -1
             if activeSide == 0:             # Top
-                x = sign*m_world*sin(angRef)
-                y = m_world*cos(angRef)
+                x = sign*m_world*sin(fixedAngle)
+                y = m_world*cos(fixedAngle)
             elif activeSide == 1:             # Right
-                x = m_world*cos(angRef)
-                y = sign*m_world*sin(angRef)
+                x = m_world*cos(fixedAngle)
+                y = sign*m_world*sin(fixedAngle)
             elif activeSide == 2:
-                x = sign*m_world*sin(angRef)
-                y = -m_world*cos(angRef)
+                x = sign*m_world*sin(fixedAngle)
+                y = -m_world*cos(fixedAngle)
             else:
-                x = -m_world*cos(angRef)
-                y = sign*m_world*sin(angRef)
+                x = -m_world*cos(fixedAngle)
+                y = sign*m_world*sin(fixedAngle)
                 
             # Add final point off in the distance
             newray.addPoint(intPoint[0]+x,intPoint[1]+y)
