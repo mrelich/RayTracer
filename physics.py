@@ -37,12 +37,8 @@ def interactionPoint(rayAngle, rayY0, rayX0,
         return (x,y)
     
     # All other cases can follow this:
-    #x = (boundaryY0 - rayY0) / (tan(rayAngle) - boundarySlope) + rayX0
     x = 1/(tan(rayAngle) - boundarySlope) * (boundaryY0 - rayY0  + tan(rayAngle)*rayX0 - boundarySlope*boundaryX0)
     y = boundarySlope * (x-boundaryX0) + boundaryY0
-    #print "\t\tNot Fixed x: ", x, y
-    #print "Ray info: ", rayAngle, rayY0, rayX0
-    #print "boundary: ", boundarySlope, boundaryY0, boundaryX0
     return (x,y)
 
 #---------------------------------------------#
@@ -57,16 +53,7 @@ def incidentAngle(v_ray, v_boundary,activeSide):
     mag = v_ray[0]*v_boundary[0] + v_ray[1]*v_boundary[1]
     magRay = sqrt(v_ray[0]*v_ray[0]+v_ray[1]*v_ray[1])
     magB   = sqrt(v_boundary[0]*v_boundary[0]+v_boundary[1]*v_boundary[1])
-    #print "\t\t\tMag = ", magRay, magB
-    #print v_ray
     angle = acos( mag/(magRay*magB) )
-
-    #print "\tAngle between vectors: ", angle, angle*180/pi
-    #print "\tIncident angle: ",  angle, (pi/2.-angle)*180/pi
-    
-    # Subtract pi/2
-    #if activeSide == 1 or activeSide == 3:
-    #    return pi/2 - angle
 
     return angle
 
@@ -84,23 +71,57 @@ def refractedAngle(incidentAngle, slope, activeSide, iceTilt):
 
     # Otherwise, the ray leaves
     angle = asin(arg) 
-    #print "In refracted: ", arg, angle, angle*180/pi
     return angle
 
 
 #---------------------------------------------#
 # Get reflected angle
 #---------------------------------------------#
-def reflectedAngle(sign, incidentAngle, activeSide, rotAng):
+def reflectedAngle(x0,y0,intX0,intY0,
+                   incAngle, activeSide, rotAng):
     
-    if activeSide == 0:
-        return sign*(pi/2. - incidentAngle)
+    # I keep coming up with special cases in my code
+    # when I think this should be handled very generically
+    # So for now I will handle each side separately based
+    # on the incident angle, the rotation angle and the active 
+    # side
+    
+    # The rotation angle is actually for the cube
+    # in the frames orientation.  We want to rotate
+    # our coordinate system such that it is normal to the cube
+    rotAng = -rotAng
+
+    # The idea is to put the coordinate system at
+    # the interaction point with normal to the side
+    # in the positive y direction and then check where
+    # our initial ray point lies to determine the angle
+    # in the coordinate system of the block
+    xt = x0 - intX0  # translate x
+    yt = y0 - intY0  # translate y
+    xr = xt*cos(rotAng) - yt*sin(rotAng)
+    yr = xt*sin(rotAng) + yt*cos(rotAng)
+
+    # Top of cube
+    pi2 = pi/2.
+
+    if activeSide == 0: 
+        if xr > 0: return pi2 - incAngle
+        return pi2 + incAngle
+    # Right
     elif activeSide == 1:
-        return sign*(pi/2. - incidentAngle)
+        if yr > 0: return -pi + incAngle
+        return pi - incAngle
+    # Bottom
     elif activeSide == 2:
-        return pi/2 - incidentAngle
+        if xr < 0: return pi2 - incAngle
+        return pi2 + incAngle
+    # Left
     elif activeSide == 3:
-        return sign*(pi/2. - incidentAngle)
+        if yr < 0: return incAngle
+        return -incAngle
+
+    # Do nothing
+    return refAng
 
 #---------------------------------------------#
 # Translate angle to det coords
@@ -143,13 +164,12 @@ def translateAngle(x0, y0, intX0, intY0,
         return refAng
     # Bottom
     elif activeSide == 2:
-        refAng = pi2 + refAng
-        if xr < 0: return -refAng
-        return refAng
+        if xr < 0: return refAng - pi2
+        return -refAng - pi2
     # Left
     elif activeSide == 3:
-        if yr < 0: return pi/2-refAng 
-        return refAng
+        if yr < 0: return pi-refAng 
+        return pi+refAng
 
     # Do nothing
     return refAng

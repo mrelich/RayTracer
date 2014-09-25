@@ -60,7 +60,7 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 
 angles = []
 conv = pi/180.
-if False: #True: #True:
+if True: #False: 
     #angles.append(90*conv)
     #angles.append(80*conv)
     #angles.append(70*conv)
@@ -75,12 +75,15 @@ if False: #True: #True:
     #angles.append((90-57)*conv)
     #angles.append(20*conv)
     #angles.append(10*conv)
-    angles.append(100*conv)
+    #angles.append(100*conv)
+    angles.append(115*conv)
+    #angles.append(180*conv)
 
-if True: 
-    nStep = 18
-    step = 5 # [deg]
-    start = 0
+
+if True: #False: #True: 
+    nStep = 9
+    step = 10 # [deg]
+    start = 90
     for i in range(nStep+1):
         angles.append(conv*(start +i*step))
 
@@ -99,12 +102,19 @@ for ang in angles:
     normals  = iceblock.getNormal()
     sideNums = [0,1,2,3]
 
+    # Hack for angles > 90
+    cornerAngle = pi - atan((iceblock.height/2.-y0)/(iceblock.length/2.-x0)) + iceblock.rotation
+    if ang > cornerAngle:
+        temp = iceEq 
+        iceEq = [temp[3], temp[2], temp[1], temp[0]]
+        temp = normals
+        normals = [temp[3], temp[2], temp[1], temp[0]]
+        sideNums = [3,2,1,0]
+        
+
     # Print some info
     print "------------------------------------------------------------"
     print "Trying angle: ", ang, ang*180/pi
-    #print iceEq
-    #print normals
-    #print sideNums
 
     # Create new ray for this angle
     newray = ray(ang,x0,y0)
@@ -115,14 +125,12 @@ for ang in angles:
     nSides   = 0
     activeSide = -1
     point = -1
-    while angRef < 0 and nSides <= 6:
+    while angRef < 0 and nSides <= 10:
 
         # Get interaction point
         intPoint = (0,0)
         v_normal   = (0,0)
         insideIce = False
-        #print "Looping over equations: ", nSides
-        #print "with coords: ", newray.angle*180/pi, newray.x, newray.y
         for i in range(len(iceEq)):
             eq = iceEq[i]
             intPoint = interactionPoint(newray.angle,
@@ -136,10 +144,10 @@ for ang in angles:
                 insideIce  = True
                 activeSide = sideNums[i]
                 point      = i
-                #print "\tActive side: ", activeSide
                 break
 
-        # Change order of iceEq
+        # Change order of iceEq for next iteration
+        # in case of reflection
         saveEq = iceEq[point]
         del iceEq[point]
         iceEq.append(saveEq)
@@ -151,25 +159,22 @@ for ang in angles:
 
         # Protect against exhausting all options
         if not insideIce: break
-        print "\t\tIncident Point: ",intPoint
+        print "\t\tIncident Point: ",intPoint, " on side", activeSide
         newray.addPoint(intPoint[0],intPoint[1])
 
         # Get Incident angle
-        #print "Prior to Incident; ", newray.getVector(), v_normal
         incAngle = incidentAngle(newray.getVector(),v_normal,activeSide)
         print "\t\tIncident Angle: ", incAngle*180/pi
 
         # Check if there is refraction
         angRef = refractedAngle(incAngle, newray.angle, activeSide, rotAng)
-        #print "\t\tRefracted angle", angRef, angRef * 180/pi
 
         if angRef < 0: 
             print "\t\t\tTIR!"
-            sign = -1
-            if newray.angle < 0: sign = 1
-            if newray.angle > 0 and saveEq[0] > 0: sign = 1
-            newAngle = sign*(pi/2. - incAngle)
-            print "\t\t\tReflected Angle", newAngle*180/pi, sign, incAngle
+            newAngle = reflectedAngle(newray.x,newray.y,intPoint[0],intPoint[1],
+                                      incAngle,activeSide,rotAng)
+            newAngle += iceblock.rotation
+            print "\t\t\tReflected Angle", newAngle*180/pi, incAngle, newray.angle
             newray.update(newAngle,intPoint[1],intPoint[0])
             #newray.addPoint(intPoint[0], intPoint[1])
         else:
@@ -183,25 +188,10 @@ for ang in angles:
             x = 0
             y = 0
             sign = 1
-            #if newray.angle < 0: sign = -1
 
             x = m_world*cos(fixedAngle)
             y = m_world*sin(fixedAngle)
             
-            #if activeSide == 0:             # Top
-            #    x = sign*m_world*sin(fixedAngle)
-            #    y = m_world*cos(fixedAngle)
-            #elif activeSide == 1:             # Right
-            #    x = m_world*cos(fixedAngle)
-            #    y = sign*m_world*sin(fixedAngle)
-            #elif activeSide == 2:
-            #    x = sign*m_world*sin(fixedAngle)
-            #    y = -m_world*cos(fixedAngle)
-            #else:
-            #    x = -m_world*cos(fixedAngle)
-            #    y = sign*m_world*sin(fixedAngle)
-            
-            print x, y
             # Add final point off in the distance
             newray.addPoint(intPoint[0]+x,intPoint[1]+y)
         
@@ -219,7 +209,6 @@ for ang in angles:
     # end while loop
 
     newray.drawRay()
-    #rays.append(newray)
 
 #end loop over angles
                                 

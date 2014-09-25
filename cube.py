@@ -96,17 +96,6 @@ class cube:
         x = point[0]
         y = point[1]
 
-        # Simple case, if there is no lean
-        #if x > self.xpos + self.length/2.: return False
-        #if x < self.xpos - self.length/2.: return False        
-        #if y > self.ypos + self.height/2.: return False        
-        #if y < self.ypos - self.height/2.: return False
-
-        # Complicated case, if there is rotation in the ice
-        # We need to take care of the fact that the side is
-        # basically a function in x-y plane determined from
-        # the rotation of the figure.
-        
         # Get Equations
         Eqs = self.getEquations()
         if self.pointFails(0,Eqs[0],x,y): return False
@@ -132,8 +121,6 @@ class cube:
             return False
     
         ycomp = slope * (x-x0) + y0
-        #print "\t\t\tComparing ", ycomp, y
-        #print "\t\t\t\tEquation: ", slope, x0, y0
         if sideNum == 0 and y > ycomp: return True
         if sideNum == 2 and y < ycomp: return True
         if sideNum == 1:
