@@ -46,10 +46,10 @@ class cube:
     #----------------------------------------#    
     # Setup the equations
     #----------------------------------------#
-    def getTop(self):   return (self.getSlope(0), self.getY0(0), self.getX0(0))
-    def getRight(self): return (self.getSlope(1), self.getY0(1), self.getX0(1))
-    def getBot(self):   return (self.getSlope(2), self.getY0(2), self.getX0(2))
-    def getLeft(self):  return (self.getSlope(3), self.getY0(3), self.getX0(3))
+    def getTop(self):   return self.buildEquation(0)
+    def getRight(self): return self.buildEquation(1)
+    def getBot(self):   return self.buildEquation(2)
+    def getLeft(self):  return self.buildEquation(3)
 
     def getEquations(self):
 
@@ -58,8 +58,15 @@ class cube:
         equations.append( self.getRight() )
         equations.append( self.getBot() )
         equations.append( self.getLeft() )
+        #self.printEquations(equations)
         return equations
 
+    def printEquations(self,eqs):
+        for eq in eqs:
+            s = eq[0]
+            y0 = eq[1]
+            x0 = eq[2]
+            print "Eq: "+ str(s) + "*(x-"+str(x0)+") + "+str(y0) 
     #----------------------------------------#
     # Get normal vector for each side
     #----------------------------------------#
@@ -100,11 +107,12 @@ class cube:
         # basically a function in x-y plane determined from
         # the rotation of the figure.
         
-        # Top:
-        if self.pointFails(0,x,y): return False
-        if self.pointFails(1,x,y): return False
-        if self.pointFails(2,x,y): return False
-        if self.pointFails(3,x,y): return False
+        # Get Equations
+        Eqs = self.getEquations()
+        if self.pointFails(0,Eqs[0],x,y): return False
+        if self.pointFails(1,Eqs[1],x,y): return False
+        if self.pointFails(2,Eqs[2],x,y): return False
+        if self.pointFails(3,Eqs[3],x,y): return False
 
         return True
 
@@ -113,95 +121,90 @@ class cube:
     #----------------------------------------#
     # Check if point passes
     #----------------------------------------#
-    def pointFails(self,sideNum,x,y):
-        slope = self.getSlope(sideNum)
-        x0    = self.getX0(sideNum)
-        y0    = self.getY0(sideNum)
+    def pointFails(self,sideNum,eq,x,y):
+        slope = eq[0]
+        x0    = eq[2]
+        y0    = eq[1]
         if slope == sys.float_info.max:
+            #print "\t\t\tInfinite slope: ", x, x0
             if x0 < 0 and x < x0: return True
             if x0 > 0 and x > x0: return True
+            return False
     
-        ycomp = slope * x + y0
-        if sideNum == 0 and y > y0: return True
-        if sideNum == 2 and y < y0: return True
+        ycomp = slope * (x-x0) + y0
+        #print "\t\t\tComparing ", ycomp, y
+        #print "\t\t\t\tEquation: ", slope, x0, y0
+        if sideNum == 0 and y > ycomp: return True
+        if sideNum == 2 and y < ycomp: return True
         if sideNum == 1:
-            if slope < 0 and y > y0: return True
-            if slope > 0 and y < y0: return True
+            if slope < 0 and y > ycomp: return True
+            if slope > 0 and y < ycomp: return True
         if sideNum == 3:
-            if slope < 0 and y < y0: return True
-            if slope > 0 and y > y0: return True
+            if slope < 0 and y < ycomp: return True
+            if slope > 0 and y > ycomp: return True
         
         return False
 
 
     #----------------------------------------#
-    # Get slope of the side
+    # Get the slope, y0, and x0 position
     #----------------------------------------#
-    def getSlope(self, sideNum):
+    def buildEquation(self,sideNum):
 
-        # Two extreme cases where we have a verticle line
-        if self.rotation == 0 and (sideNum == 1 or sideNum ==3):
-            return sys.float_info.max
-        if self.rotation*pi/180 == 90 and (sideNum == 0 or sideNum == 2):
-            return sys.float_info.max
-
-        # Now handle based on which side we are looking at
-        if sideNum == 0 or sideNum == 2: return tan(self.rotation)
-        else: return 1/tan(self.rotation)
-    
-    #----------------------------------------#
-    # Get y0
-    #----------------------------------------#
-    def getY0(self, sideNum):
+        # Deal with two specific cases: 0 and 90 degree rotation
+        if self.rotation == 0: # Perfect cube
+            if sideNum == 1 or sideNum == 3:
+                x0 = self.length/2.
+                if(sideNum == 3): x0 = -x0
+                return (sys.float_info.max, 0, x0)
+            else:
+                y0 = self.height/2.
+                if sideNum == 2: y0 = -y0
+                return (0, y0, 0)
+        elif self.rotation == 90*pi/180: # rotated cube
+            if sideNum == 1 or sideNum == 3:
+                y0 = -self.length/2.
+                if sideNum == 3: y0 = -y0
+                return (0,y0,0)
+            else:
+                x0 = self.height/2.
+                if sideNum == 2: x0 = -x0
+                return (sys.float_info.max, 0, x0)
         
-        x0    = 0
-        y0    = 0
-        slope = 0
+        # Now handle generic rotation case
+        x1 = 0
+        x0 = 0
+        y1 = 0
+        y0 = 0
+        
+        # Start from a perfect cube
         if sideNum == 0:
             x0 = -self.length/2.
-            y0 =  self.height/2.
+            x1 = self.length/2.
+            y0 = self.height/2.
+            y1 = self.height/2.
         elif sideNum == 1:
-            x0 =  self.length/2.
-            y0 =  self.height/2.
+            x0 = self.length/2.
+            x1 = self.length/2.
+            y0 = -self.height/2.
+            y1 = self.height/2.
         elif sideNum == 2:
             x0 = -self.length/2.
+            x1 = self.length/2.
             y0 = -self.height/2.
+            y1 = -self.height/2.
         elif sideNum == 3:
             x0 = -self.length/2.
-            y0 = self.height/2.
-        
-        slope = self.getSlope(sideNum)
-        x0,y0 = self.rotateCoords(x0,y0)
-        
-        return y0 - slope*x0
-
-    #----------------------------------------#
-    # Get x0 -- only needed when slope is 
-    # infinite (eg. for a vertical line)
-    #----------------------------------------#
-    def getX0(self, sideNum):
-        
-        slope = self.getSlope(sideNum)
-        if slope != sys.float_info.max:
-            return 0
-        
-        x0    = 0
-        y0    = 0
-        slope = 0
-        if sideNum == 0:
-            x0 = -self.length/2.
-            y0 =  self.height/2.
-        elif sideNum == 1:
-            x0 =  self.length/2.
-            y0 =  self.height/2.
-        elif sideNum == 2:
-            x0 = -self.length/2.
+            x1 = -self.length/2.
             y0 = -self.height/2.
-        elif sideNum == 3:
-            x0 = -self.length/2.
-            y0 = self.height/2.
+            y1 = self.height/2.
 
-        slope = self.getSlope(sideNum)
+        # Now add rotation
+        x1,y1 = self.rotateCoords(x1,y1)
         x0,y0 = self.rotateCoords(x0,y0)
         
-        return x0 - y0/slope
+        # Define slope
+        slope = (y1-y0)/(x1-x0)
+        
+        # Now return equation
+        return (slope,y0,x0)

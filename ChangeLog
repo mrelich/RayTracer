@@ -1,3 +1,8 @@
+2014-09-25 Matt:
+	* Fixed the bugs due to reflection and refraction at each boundary (I think).
+	* Only works for angles 0-90, then it gets confused.  This should be fixed in future!
+	* Tagging version
+
 2014-09-24 Matt:
 	* Fixed one bug dealing with exiting angle when rotating.
 	* Found another issue due with activeSide and the equations list.
