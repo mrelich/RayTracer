@@ -1,3 +1,7 @@
+2014-09-26 Matt:
+	* Added options for running different angles
+	* Found some odd bug at angle 110 -- Just stops after two iterations(?)
+
 2014-09-25 Matt:
 	* Fixed the bugs due to reflection and refraction at each boundary (I think).
 	* Only works for angles 0-90, then it gets confused.  This should be fixed in future!

@@ -1,4 +1,8 @@
+#!/usr/local/bin/python
+
+# This is for runnning on linux
 #!/usr/bin/python
+
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 # This will be the 'executable' that will draw the ray tracing for the ice #
@@ -14,6 +18,76 @@ from visual import *
 from cube import *
 from ray import *
 from physics import *
+import sys
+from optparse import OptionParser
+
+#-------------------------------------#
+# Parse some simple user options
+#-------------------------------------#
+
+#
+## Setup parser
+#
+parser = OptionParser()
+
+parser.add_option("-s", "--stepsize", action="store",
+                  type=int, default=10, dest="stepsize",
+                  help="Option to set number of steps")
+parser.add_option("-l", "--less90", action="store_true",
+                  default=False, dest="L90",
+                  help="Option to run angles 0-90")
+parser.add_option("-g", "--greater90", action="store_true",
+                  default=False, dest="G90",
+                  help="Optin to run angles 90-180")
+parser.add_option("-a","--angle",action="store",
+                  type=float,default=-1,dest="angle",
+                  help="Specify a specific angle")
+
+#
+## Load the options
+#
+
+print "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+print "Starting ray tracing program"
+print ""
+
+opts, args = parser.parse_args()
+
+angles = []
+stepsize = opts.stepsize
+if opts.L90:
+    angMax = 90
+    angle  = 0
+    while angle <= angMax:
+        angles.append( angle )
+        angle += stepsize
+    print "Running for angles 0-90"
+elif opts.G90:
+    angMax = 180
+    angle  = 90
+    while angle <= angMax:
+        angles.append( angle )
+        angle += stepsize
+    print "Running for angles 90-180"
+elif opts.angle > 0:
+    angles.append( opts.angle )
+    print "Running for angle: ", angles[0]
+else:
+    print "Please specify angles to use."
+    print ""
+    sys.exit()
+
+print angles
+print ""
+print ""
+
+
+#
+## Convert all angles to radians
+#
+for i in range(len(angles)):
+    angles[i] = angles[i] * pi/180.
+
 
 #-------------------------------------#
 # Setup the environment
@@ -57,35 +131,6 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 
 # Define angles to consider
 #angles = [pi/2,pi/6.] #,pi/3,pi/4,pi/5,pi/6] #,pi/8]
-
-angles = []
-conv = pi/180.
-if True: #False: 
-    #angles.append(90*conv)
-    #angles.append(80*conv)
-    #angles.append(70*conv)
-    #angles.append(30*conv)
-    #angles.append(40*conv)
-    #angles.append(90*conv)
-    #angles.append(50*conv)
-    #angles.append(60*conv)
-    #angles.append(50*conv)
-    #angles.append(60*conv)
-    #angles.append(30*conv)
-    #angles.append((90-57)*conv)
-    #angles.append(20*conv)
-    #angles.append(10*conv)
-    #angles.append(100*conv)
-    angles.append(115*conv)
-    #angles.append(180*conv)
-
-
-if True: #False: #True: 
-    nStep = 9
-    step = 10 # [deg]
-    start = 90
-    for i in range(nStep+1):
-        angles.append(conv*(start +i*step))
 
 botEq = iceblock.getBot()
 x0    = 0
@@ -174,7 +219,8 @@ for ang in angles:
             newAngle = reflectedAngle(newray.x,newray.y,intPoint[0],intPoint[1],
                                       incAngle,activeSide,rotAng)
             newAngle += iceblock.rotation
-            print "\t\t\tReflected Angle", newAngle*180/pi, incAngle, newray.angle
+            print "\t\t\tReflected Angle", (pi/2 - incAngle)*180/pi
+            print "\t\t\tReflected Angle in frame coords", newAngle*180/pi 
             newray.update(newAngle,intPoint[1],intPoint[0])
             #newray.addPoint(intPoint[0], intPoint[1])
         else:
