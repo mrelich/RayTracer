@@ -25,7 +25,7 @@ test()
   // Now experiment to try to get this right...
   double angle = -30 * TMath::Pi()/180.;
   //double angle = 0;
-  cout<<"tan(angle): "<<tan(angle)<<" "<<tan(-angle)<<endl;
+  cout<<"tan(angle): "<<tan(angle)<<" "<<-1/tan(angle)<<endl;
 
   // top
   double x0 = -0.5, x1 = 0.5, y0 = 0.15, y1 = 0.15;
@@ -37,12 +37,26 @@ test()
   x0 = -0.5; x1 = 0.5; y0 = -0.15; y1 = -0.15;
   rotation(angle,x0,y0); rotation(angle,x1,y1);
   cout<<"Bottom slope: "<<(y1-y0)/(x1-x0)<<endl;
+  double slope = (y1-y0)/(x1-x0);
+  printEq(slope,x0,y0);
+  TLine* ntop = makeLine(x0,x1,y0,y1,kRed,1); ntop->Draw("same");
+  
+  
+  // bot
+  x0 = -0.5; x1 = 0.5; y0 = -0.15; y1 = -0.15;
+  rotation(angle,x0,y0); rotation(angle,x1,y1);
+  slope = (y1-y0)/(x1-x0);
+  printEq(slope,x0,y0);
+  //cout<<"Bottom slope: "<<(y1-y0)/(x1-x0)<<endl;
   TLine* nbot = makeLine(x0,x1,y0,y1,kRed,1); nbot->Draw("same");
 
   // right
   x0 = 0.5; x1 = 0.5, y0 = -0.15; y1 = 0.15;
   rotation(angle,x0,y0); rotation(angle,x1,y1);
   cout<<"Right slope: "<<(y1-y0)/(x1-x0)<<endl;
+  slope = (y1-y0)/(x1-x0);
+  printEq(slope,x0,y0);
+  //cout<<"Right slope: "<<(y1-y0)/(x1-x0)<<endl;
   TLine* nR = makeLine(x0,x1,y0,y1,kRed,1); nR->Draw("same");
   
   // left
@@ -62,8 +76,19 @@ test()
   // Top 
   x0 = -length/2., y0 = height/2.;
   evaluate(slope,x1,y0);
-    
+  slope = (y1-y0)/(x1-x0);
+  printEq(slope,x0,y0);
+  TLine* nL = makeLine(x0,x1,y0,y1,kRed,1); nL->Draw("same");
 
+  // Testing
+  TF1* ftop = new TF1("top","-0.57735026919*(x-0.3) + 0.173205080757",-1,1);
+  ftop->Draw("same");
+    
+}
+
+void printEq(double slope, double x, double y)
+{
+  cout<<"Eq: "<<slope<<"*(x-"<<x<<") + "<<y<<endl;
 }
 
 double rotation(double angle, double &x, double &y)

@@ -1,6 +1,20 @@
 2014-09-30 Matt:
 	* Adding testing file test.C in order to check geometry
 
+2014-09-26 Matt:
+	* Added options for running different angles
+	* Found some odd bug at angle 110 -- Just stops after two iterations(?)
+
+2014-09-25 Matt:
+	* Fixed the bugs due to reflection and refraction at each boundary (I think).
+	* Only works for angles 0-90, then it gets confused.  This should be fixed in future!
+	* Tagging version.00.00.01
+	* Fixed > 90 degree issue.  Now ok for angles 0-180 degree. Had to do with reflections
+	* Added reflection method to physics
+	* Cleaning up printouts
+	* Tagging version.00.00.02
+	* For future try to consolidate reflective and refractive methods.
+
 2014-09-24 Matt:
 	* Fixed one bug dealing with exiting angle when rotating.
 	* Found another issue due with activeSide and the equations list.

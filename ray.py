@@ -43,10 +43,13 @@ class ray:
     def getVector(self):
 
         np = len(self.points)
-        if np < 2: return (0,0)
+        if np < 2: 
+            print "\t\t\tWarning: Not enough points..."
+            return (0,0)
 
         p0 = self.points[np-2]
         p1 = self.points[np-1]
+        #print "\t Making Vector: ", p1, p0
         newX = p1[0] - p0[0]
         newY = p1[1] - p0[1]
         vect = (newX, newY)
@@ -56,10 +59,11 @@ class ray:
     # Make curve object
     #----------------------------------#
     def drawRay(self):
-        print "Drawing Ray"
-        print self.points
+        #print "Drawing Ray"
+        #print self.points
         self.ray = curve(pos=self.points,
                          color=(0,0,0),
-                         radius=0.005
+                         #radius=0.005
+                         radius=0.002
                          )
         
