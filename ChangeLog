@@ -1,7 +1,7 @@
 2014-10-03 Matt:
 	* Updating main to take option of rotation angle for ice
 	* Removing the corner check.  This seems obsolete and was causing some errors.
-	* Tagging version 00.03
+	* Tagging version 00.03 -- NEVER TAGGED 00.02!  Changing to version 00.02
 
 2014-09-30 Matt:
 	* Adding testing file test.C in order to check geometry
