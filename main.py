@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 # This is for runnning on linux
 #!/usr/bin/python
@@ -33,7 +33,8 @@ from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option("-s", "--stepsize", action="store",
-                  type=int, default=10, dest="stepsize",
+                  #type=int, default=10, dest="stepsize",
+                  type=float, default=10, dest="stepsize",
                   help="Option to set number of steps")
 parser.add_option("-l", "--less90", action="store_true",
                   default=False, dest="L90",

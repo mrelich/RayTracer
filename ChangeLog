@@ -2,6 +2,7 @@
 	* Updating main to take option of rotation angle for ice
 	* Removing the corner check.  This seems obsolete and was causing some errors.
 	* Tagging version 00.03 -- NEVER TAGGED 00.02!  Changing to version 00.02
+	* Adding the option to be able to input non-integar steps (so can use floating point)
 
 2014-09-30 Matt:
 	* Adding testing file test.C in order to check geometry
