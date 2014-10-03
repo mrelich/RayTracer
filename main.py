@@ -1,8 +1,10 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 
 # This is for runnning on linux
 #!/usr/bin/python
 
+# For running on my mac
+#!/usr/local/bin/python
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 # This will be the 'executable' that will draw the ray tracing for the ice #
@@ -42,6 +44,9 @@ parser.add_option("-g", "--greater90", action="store_true",
 parser.add_option("-a","--angle",action="store",
                   type=float,default=-1,dest="angle",
                   help="Specify a specific angle")
+parser.add_option("-r", "--rotation", action="store",
+                  type=float, default=-30,dest="rotAngle",
+                  help="Specify rotation angle for ice")
 
 #
 ## Load the options
@@ -88,6 +93,11 @@ print ""
 for i in range(len(angles)):
     angles[i] = angles[i] * pi/180.
 
+#
+## Save rotation angle
+#
+
+rotAng = opts.rotAngle * pi/180
 
 #-------------------------------------#
 # Setup the environment
@@ -95,9 +105,24 @@ for i in range(len(angles)):
 
 m_world = 1
 window = display(title='Ray Tracing', x=0, y=0, 
-                 width=600, height=600,
-                 center=(0,0,0), background=(1,1,1),
+                 width=800, height=800,
+                 center=(0,0,0), 
+                 #center=(5,0,0), 
+                 #scale=(0.1,0.1,1),
+                 background=(1,1,1),                 
                  range=m_world)
+
+#-------------------------------------#
+# Add antenna Pole off to the right
+#-------------------------------------#
+
+#p_height = 8 # [m]
+#p_center = (8,-0.15,0)  # [m]
+#pole = cylinder(pos = p_center,
+#                axis = (0,p_height,0),
+#                radius = 0.1,
+#                color=(1,0,0))
+
 
 #-------------------------------------#
 # Make the ice block
@@ -112,11 +137,6 @@ width   = 0.3 # [m] This is not used. Just 2D
 icex = 0
 icey = 0
 icez = 0
-
-# Angle to rotate
-rotAng = -30*pi/180. # [rad]
-#rotAng = 30*pi/180. # [rad]
-#rotAng = 0. # [rad]
 
 # make the cube
 iceblock = cube(icex,icey,icez,length,height,rotAng)
@@ -243,14 +263,6 @@ for ang in angles:
         
         # Incraease nSides hit by one
         nSides += 1
-
-        # Add a check for corner events
-        # Remove if point is within 10% of edges
-        ratioX = 1- fabs(intPoint[0])/(iceblock.xpos + iceblock.length/2.)
-        ratioY = 1- fabs(intPoint[1])/(iceblock.ypos + iceblock.height/2.)
-        threshold = 0.05
-        if ratioX < threshold and ratioY < threshold:
-            break
 
     # end while loop
 
