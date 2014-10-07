@@ -25,9 +25,12 @@ def interactionPoint(rayAngle, rayY0, rayX0,
 
     # Check for non-zero slope
     # Which implies lines never cross
+    # Also check for parallel lines (never cross)
     if boundarySlope == 0 and tan(rayAngle) == 0:
         print "\tInt point info: ", boundarySlope, rayAngle, tan(rayAngle)
         return (-9999,-9999)
+    if boundarySlope == tan(rayAngle):
+        return (-9999,9999)
     
     # Handle the case of x=constant
     if boundarySlope == sys.float_info.max:
@@ -37,6 +40,7 @@ def interactionPoint(rayAngle, rayY0, rayX0,
         return (x,y)
     
     # All other cases can follow this:
+    #print tan(rayAngle), boundarySlope
     x = 1/(tan(rayAngle) - boundarySlope) * (boundaryY0 - rayY0  + tan(rayAngle)*rayX0 - boundarySlope*boundaryX0)
     y = boundarySlope * (x-boundaryX0) + boundaryY0
     return (x,y)

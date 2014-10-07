@@ -150,13 +150,10 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 # Determine which angles to draw
 #-------------------------------------#
 
-# Define angles to consider
-#angles = [pi/2,pi/6.] #,pi/3,pi/4,pi/5,pi/6] #,pi/8]
-
+# Specify x0 and y0 for beam
 botEq = iceblock.getBot()
 x0    = 0
 y0    = botEq[0]*(x0-botEq[2]) + botEq[1] + 0.1
-
 
 # Add Rays for each angle and calculate
 # the points
@@ -164,18 +161,22 @@ rays = []
 for ang in angles:
 
     # Get equations defining cube
-    iceEq    = iceblock.getEquations()
-    normals  = iceblock.getNormal()
-    sideNums = [0,1,2,3]
+    #iceEq    = iceblock.getEquations()
+    #normals  = iceblock.getNormal()
+    #sideNums = [0,1,2,3]
+    iceEq, normals, sideNums = iceblock.getSideInformation(ang*180/pi)
 
     # Hack for angles > 90
-    cornerAngle = pi - atan((iceblock.height/2.-y0)/(iceblock.length/2.-x0)) + iceblock.rotation
-    if ang > cornerAngle:
-        temp = iceEq 
-        iceEq = [temp[3], temp[2], temp[1], temp[0]]
-        temp = normals
-        normals = [temp[3], temp[2], temp[1], temp[0]]
-        sideNums = [3,2,1,0]
+    #cornerAngle = pi - atan((iceblock.height/2.-y0)/(iceblock.length/2.-x0)) + iceblock.rotation
+    #if ang > cornerAngle:
+    #    temp = iceEq 
+        #iceEq = [temp[3], temp[2], temp[1], temp[0]]
+    #    iceEq = [temp[0], temp[3], temp[2], temp[1]]
+    #    temp = normals
+        #normals = [temp[3], temp[2], temp[1], temp[0]]
+    #    normals = [temp[0], temp[3], temp[2], temp[1]]
+        #sideNums = [3,2,1,0]
+    #    sideNums = [0,3,2,1]
         
 
     # Print some info
@@ -199,6 +200,7 @@ for ang in angles:
         insideIce = False
         for i in range(len(iceEq)):
             eq = iceEq[i]
+            #print "Checking interaction point: ", sideNums[i]
             intPoint = interactionPoint(newray.angle,
                                         newray.y,
                                         newray.x,
@@ -261,7 +263,7 @@ for ang in angles:
             
             # Add final point off in the distance
             newray.addPoint(intPoint[0]+x,intPoint[1]+y)
-        
+
         # Incraease nSides hit by one
         nSides += 1
 
@@ -270,5 +272,4 @@ for ang in angles:
     newray.drawRay()
 
 #end loop over angles
-                                
 sys.exit()

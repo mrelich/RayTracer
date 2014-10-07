@@ -43,6 +43,39 @@ class cube:
         newy = x*sin(self.rotation) + y*cos(self.rotation)
         return newx, newy
 
+    #----------------------------------------#
+    # Wrapper method to return the equations
+    # the normals and the side numbers
+    #----------------------------------------#
+    def getSideInformation(self, initAngle):
+
+        # Get the right to left results
+        eqs   = self.getEquations()
+        norms = self.getNormal()
+        nums  = [0,1,2,3]
+
+        # Rotate angle to be normal to 
+        # the rotated cube
+        angle = initAngle + self.rotation
+
+        newNums = nums
+        #if 0 <= angle and angle <= 90:
+        #    newNums = nums
+        if 90 < angle and angle <= 90+45:
+            newNums  = [0,3,2,1]
+        elif 90+45 < angle:
+            newNums = [3,2,1,0]
+        
+        # Set the return values
+        newEqs   = []
+        newNorms = []
+        for i in newNums:
+            newEqs.append(eqs[i])
+            newNorms.append(norms[i])
+        
+        # Return
+        return newEqs, newNorms, newNums
+
     #----------------------------------------#    
     # Setup the equations
     #----------------------------------------#

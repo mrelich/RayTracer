@@ -1,3 +1,7 @@
+2014-10-07 Matt:
+	* Updating how the order of iteration is chosen depending on initial angle.
+	* Taggin version 00.03 (for real this time!)
+
 2014-10-03 Matt:
 	* Updating main to take option of rotation angle for ice
 	* Removing the corner check.  This seems obsolete and was causing some errors.
