@@ -1,3 +1,6 @@
+2014-11-17 Matt:
+	* Adding option to move the beam location in x-range
+
 2014-10-03 Matt:
 	* Updating main to take option of rotation angle for ice
 	* Removing the corner check.  This seems obsolete and was causing some errors.

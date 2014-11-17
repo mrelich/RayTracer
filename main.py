@@ -47,6 +47,9 @@ parser.add_option("-a","--angle",action="store",
 parser.add_option("-r", "--rotation", action="store",
                   type=float, default=-30,dest="rotAngle",
                   help="Specify rotation angle for ice")
+parser.add_option("-i", "--injection", action="store",
+                  type=float, default=0,dest="injPoint",
+                  help="Specify injection point in ice")
 
 #
 ## Load the options
@@ -130,6 +133,8 @@ window = display(title='Ray Tracing', x=0, y=0,
 
 # Dimensions
 length  = 1  # [m]
+#length  = 0.5  # [m]
+#length  = 0.3  # [m]
 height  = 0.3 # [m]
 width   = 0.3 # [m] This is not used. Just 2D
 
@@ -153,8 +158,8 @@ iceblock = cube(icex,icey,icez,length,height,rotAng)
 #angles = [pi/2,pi/6.] #,pi/3,pi/4,pi/5,pi/6] #,pi/8]
 
 botEq = iceblock.getBot()
-x0    = 0
-y0    = botEq[0]*(x0-botEq[2]) + botEq[1] + 0.1
+x0    = opts.injPoint
+y0    = botEq[0]*(x0-botEq[2]) + botEq[1] + 0.06
 
 
 # Add Rays for each angle and calculate

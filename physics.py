@@ -53,9 +53,10 @@ def incidentAngle(v_ray, v_boundary,activeSide):
     mag = v_ray[0]*v_boundary[0] + v_ray[1]*v_boundary[1]
     magRay = sqrt(v_ray[0]*v_ray[0]+v_ray[1]*v_ray[1])
     magB   = sqrt(v_boundary[0]*v_boundary[0]+v_boundary[1]*v_boundary[1])
-    angle = acos( mag/(magRay*magB) )
-
-    return angle
+    if mag/(magRay*magB) <= 1:
+        return acos( mag/(magRay*magB) )
+    else:
+        return 0
 
 
 #---------------------------------------------#
